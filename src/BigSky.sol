@@ -45,5 +45,4 @@ contract BigSky {
     return ship;
   }
 
-
 }

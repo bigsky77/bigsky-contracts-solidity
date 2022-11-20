@@ -3,10 +3,12 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
 
-contract CounterScript is Script {
-    function setUp() public {}
+import "../src/BigSky.sol";
 
+contract DeployBigSky is Script {
     function run() public {
-        vm.broadcast();
+        vm.startBroadcast();
+
+        new BigSky();
     }
 }

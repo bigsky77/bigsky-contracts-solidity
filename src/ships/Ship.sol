@@ -10,4 +10,8 @@ contract Ship {
     bigsky = _bigsky;
   }
 
+  function takeYourTurn(BigSky.ShipData[] calldata allships, uint256 playerIndex) external  {
+
+  }
+
 }

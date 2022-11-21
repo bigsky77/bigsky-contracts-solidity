@@ -6,12 +6,14 @@ import { Ship } from './ships/Ship.sol';
 contract BigSky {
   address immutable owner;
 
+  uint72 internal constant PLAYERS_REQUIRED = 1;
+
   /*//////////////////////////////////////////////////////////////
                                EVENTS
   //////////////////////////////////////////////////////////////*/
 
   event ShipRegistered(uint256 indexed turn, Ship indexed ship);
-  event GameStart(bool _isStarted);
+  event GameStarted(State state);
   event PlayerMove(uint256 _positionX, uint256 _positionyY);
 
   /*//////////////////////////////////////////////////////////////
@@ -32,13 +34,26 @@ contract BigSky {
     _;
   }
 
+  modifier onlyDuringGame() {
+   require(state == State.ACTIVE, 'GAME NOT ACTIVE');
+   
+   _;
+  } 
+
   /*//////////////////////////////////////////////////////////////
                              GAME STATE
   //////////////////////////////////////////////////////////////*/
 
-  bool isStarted;
+  enum State {
+    WAITING,
+    ACTIVE,
+    DONE
+  }
+  State public state;
 
   uint72 public entropy; 
+
+  uint72 public turn = 100;
 
   struct ShipData {
     uint256 positionX;
@@ -66,15 +81,18 @@ contract BigSky {
   //////////////////////////////////////////////////////////////*/
 
   function startGame() public {
-    isStarted = true;
+    state = State.ACTIVE;
     
     setEnemies();
     setStars();
-    emit GameStart(isStarted);
+
+    play(turn);
+    emit GameStarted(state);
   }
 
   function registerPlayer(Ship ship) public {
     require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
+    state = State.WAITING;
 
     getShipData[ship] = ShipData({positionX: 0, positionY: 0, ship: ship});
     ships.push(ship);
@@ -113,6 +131,17 @@ contract BigSky {
   /*//////////////////////////////////////////////////////////////
                                 GAME
   //////////////////////////////////////////////////////////////*/
+
+  function play(uint256 _turns) internal onlyDuringGame {
+    for(; _turns != 0; _turns--){
+      Ship[] memory allShips = ships;
+      EnemyData[] memory allEnemies = enemies;
+      StarData[] memory allStars = stars;
+      
+      uint currentTurn = turn;
+      Ship currentShip = allShips[turn % PLAYERS_REQUIRED];
+    } 
+  }
 
   /*//////////////////////////////////////////////////////////////
                                UTILS

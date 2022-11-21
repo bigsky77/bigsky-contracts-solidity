@@ -15,6 +15,7 @@ contract BigSky {
   event ShipRegistered(uint256 indexed turn, Ship indexed ship);
   event GameStarted(State state);
   event PlayerMove(uint256 _positionX, uint256 _positionyY);
+  event TurnComplete(uint256 _turn, Ship[] _ships, EnemyData[] _enemies, StarData[] _stars);
 
   /*//////////////////////////////////////////////////////////////
                             CONSTRUCTOR
@@ -140,6 +141,8 @@ contract BigSky {
       
       uint currentTurn = turn;
       Ship currentShip = allShips[turn % PLAYERS_REQUIRED];
+
+      emit TurnComplete(turn, allShips, allEnemies, allStars);
     } 
   }
 

@@ -10,6 +10,7 @@ contract BigSky {
                                EVENTS
   //////////////////////////////////////////////////////////////*/
 
+  event ShipRegistered(uint256 indexed turn, Ship indexed ship);
   event GameStart(bool _isStarted);
   event PlayerMove(uint256 _positionX, uint256 _positionyY);
 
@@ -37,20 +38,28 @@ contract BigSky {
 
   bool isStarted;
 
-  enum ShipType{
-    PLAYER,
-    ENEMY,
-    STAR
-  } 
-
-  ShipType ship_type; 
+  uint72 public entropy; 
 
   struct ShipData {
     uint256 positionX;
     uint256 positionY;
-    ShipType ship_type;
+    Ship ship;
   }
-  ShipData ship;
+  Ship[] public ships;
+
+  mapping(Ship => ShipData) public getShipData;
+
+  struct EnemyData {
+    uint256 positionX;
+    uint256 positionY;
+  }
+  EnemyData[] public enemies; 
+  
+  struct StarData {
+    uint256 positionX;
+    uint256 positionY;
+  }
+  StarData[] public stars;
 
   /*//////////////////////////////////////////////////////////////
                                SETUP
@@ -59,31 +68,62 @@ contract BigSky {
   function startGame() public {
     isStarted = true;
     
-    setPosition();
+    setEnemies();
+    setStars();
     emit GameStart(isStarted);
   }
 
-  function setPosition() internal {
-    uint256 x = 0;
-    uint256 y = 0;
-    ship = ShipData(x, y, ship_type); 
+  function registerPlayer(Ship ship) public {
+    require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
 
-    emit PlayerMove(x, y);
+    getShipData[ship] = ShipData({positionX: 0, positionY: 0, ship: ship});
+    ships.push(ship);
+
+    entropy = uint72(block.timestamp);
+
+    emit ShipRegistered(0, ship);
+  }
+  
+  function setEnemies() internal {
+    uint256 x;
+    uint256 y;
+    EnemyData memory newEnemy;
+
+    for (uint256 i = 0; i < 3; i++) {
+      x = getRandomX();
+      y = getRandomY();
+      newEnemy = EnemyData({positionX: x, positionY: y});
+      enemies.push(newEnemy);
+    }
+  }
+  
+  function setStars() internal {
+    uint256 x;
+    uint256 y;
+    StarData memory newStar;
+
+    for (uint256 i = 0; i <= 15; i++) {
+      x = getRandomX(); 
+      y = getRandomY();
+      newStar = StarData({positionX: x, positionY: y});
+      stars.push(); 
+    } 
   }
 
   /*//////////////////////////////////////////////////////////////
                                 GAME
   //////////////////////////////////////////////////////////////*/
 
-  function updatePosition(uint _x, uint _y) public {
-    ship.positionX = _x;
-    ship.positionY = _y;
+  /*//////////////////////////////////////////////////////////////
+                               UTILS
+  //////////////////////////////////////////////////////////////*/
 
-    emit PlayerMove(_x, _y);
-  }
+  function getRandomX() internal view returns(uint256){
+    return uint(keccak256(abi.encodePacked(entropy))) % 12;
+  } 
 
-  function getPosition() public view returns(ShipData memory _ship){
-    return ship;
+  function getRandomY() internal view returns(uint256){
+    return uint(keccak256(abi.encodePacked(entropy))) % 17;
   }
 
 }

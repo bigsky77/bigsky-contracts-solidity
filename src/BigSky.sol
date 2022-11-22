@@ -14,8 +14,9 @@ contract BigSky {
 
   event ShipRegistered(uint256 indexed turn, Ship indexed ship);
   event GameStarted(State state);
+  event StarLocations(StarData[] _stars);
   event PlayerMove(uint256 _positionX, uint256 _positionyY);
-  event TurnComplete(uint256 _turn, Ship[] _ships, EnemyData[] _enemies, StarData[] _stars);
+  event TurnComplete(uint256 _turn, ShipData ship, EnemyData[] _enemies);
 
   /*//////////////////////////////////////////////////////////////
                             CONSTRUCTOR
@@ -54,7 +55,7 @@ contract BigSky {
 
   uint72 public entropy; 
 
-  uint72 public turn = 100;
+  uint72 public turn = 10;
 
   struct ShipData {
     uint256 positionX;
@@ -109,8 +110,8 @@ contract BigSky {
     EnemyData memory newEnemy;
 
     for (uint256 i = 0; i < 3; i++) {
-      x = getRandomX();
-      y = getRandomY();
+      x = getRandomX(i);
+      y = getRandomY(i);
       newEnemy = EnemyData({positionX: x, positionY: y});
       enemies.push(newEnemy);
     }
@@ -122,11 +123,12 @@ contract BigSky {
     StarData memory newStar;
 
     for (uint256 i = 0; i <= 15; i++) {
-      x = getRandomX(); 
-      y = getRandomY();
+      x = getRandomX(i); 
+      y = getRandomY(i);
       newStar = StarData({positionX: x, positionY: y});
-      stars.push(); 
+      stars.push(newStar); 
     } 
+    emit StarLocations(stars);
   }
 
   /*//////////////////////////////////////////////////////////////
@@ -139,23 +141,33 @@ contract BigSky {
       EnemyData[] memory allEnemies = enemies;
       StarData[] memory allStars = stars;
       
-      uint currentTurn = turn;
+      uint currentTurn = _turns;
       Ship currentShip = allShips[turn % PLAYERS_REQUIRED];
 
-      emit TurnComplete(turn, allShips, allEnemies, allStars);
+      emit TurnComplete(currentTurn, getShipData[currentShip], allEnemies);
     } 
   }
+
+  function checkCollide(Ship _ship) internal onlyDuringGame {
+    ShipData memory currentShip = getShipData[_ship];
+
+    for (uint256 i = 0; i < enemies.length; i++) {
+        if (enemies[i].positionX == currentShip.positionX && enemies[i].positionY == currentShip.positionY){
+          state = State.DONE; 
+        }
+    }
+  } 
 
   /*//////////////////////////////////////////////////////////////
                                UTILS
   //////////////////////////////////////////////////////////////*/
 
-  function getRandomX() internal view returns(uint256){
-    return uint(keccak256(abi.encodePacked(entropy))) % 12;
+  function getRandomX(uint _seed) internal view returns(uint256){
+    return uint(keccak256(abi.encodePacked(entropy * _seed))) % 12;
   } 
 
-  function getRandomY() internal view returns(uint256){
-    return uint(keccak256(abi.encodePacked(entropy))) % 17;
+  function getRandomY(uint _seed) internal view returns(uint256){
+    return uint(keccak256(abi.encodePacked(entropy * _seed))) % 17;
   }
-
+    
 }

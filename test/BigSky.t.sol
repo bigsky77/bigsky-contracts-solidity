@@ -20,11 +20,6 @@ contract BigSkyTest is Test {
     function testGame() public {
         bigsky.registerPlayer(ship);
         bigsky.startGame();
-        
         BigSky.ShipData memory ship;
-          emit log_named_uint("locationX", ship.positionX);   
-          emit log_named_uint("locationY", ship.positionY);
-
-        console.log();
     }
 }

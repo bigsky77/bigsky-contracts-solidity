@@ -15,7 +15,7 @@ contract BigSky {
   event ShipRegistered(uint256 indexed turn, Ship indexed ship);
   event GameStarted(State state);
   event StarLocations(StarData[] _stars);
-  event PlayerMove(uint256 positionX, uint256 positionyY);
+  event PlayerMove(uint256 positionX, uint256 positionY);
   event TurnComplete(uint256 turn, ShipData ship, EnemyData[] enemies);
 
   /*//////////////////////////////////////////////////////////////
@@ -146,7 +146,8 @@ contract BigSky {
       uint currentTurn = _turns;
       Ship currentShip = allShips[turn % PLAYERS_REQUIRED];
       
-      currentShip.takeYourTurn();
+      uint256 INDEX = 0; // placeholder
+      currentShip.takeYourTurn(INDEX);
       enemyMove(currentTurn);
 
       emit TurnComplete(currentTurn, getShipData[currentShip], allEnemies);
@@ -201,6 +202,35 @@ contract BigSky {
   /*//////////////////////////////////////////////////////////////
                             SHIP ACTIONS
   //////////////////////////////////////////////////////////////*/
+  
+  enum Move{
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+  }
+  Move move;
+
+  function playerMove(Move _move, ShipData memory _mydata) internal {
+    if(_move == Move.UP){
+      require(_mydata.positionY + 1 < 17, "error");
+        _mydata.positionY + 1;
+      
+    } else 
+    if(_move == Move.DOWN){
+      require(_mydata.positionY - 1 > 0, "error");
+        _mydata.positionY - 1;
+    } else 
+    if(_move == Move.LEFT){
+      require(_mydata.positionX - 1 > 0, "error");
+        _mydata.positionX - 1;
+    } else
+    if(_move == Move.RIGHT){
+    require(_mydata.positionX + 1 < 12, "error");
+        _mydata.positionX - 1;
+    }
+  }
+  
 
   /*//////////////////////////////////////////////////////////////
                                UTILS

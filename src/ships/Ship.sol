@@ -10,8 +10,7 @@ contract Ship {
     bigsky = _bigsky;
   }
 
-  function takeYourTurn() external  {
-
+  function takeYourTurn(uint256 yourShipIndex) external  {
   }
 
 }

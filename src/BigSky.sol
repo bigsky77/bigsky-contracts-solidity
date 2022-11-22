@@ -15,8 +15,8 @@ contract BigSky {
   event ShipRegistered(uint256 indexed turn, Ship indexed ship);
   event GameStarted(State state);
   event StarLocations(StarData[] _stars);
-  event PlayerMove(uint256 _positionX, uint256 _positionyY);
-  event TurnComplete(uint256 _turn, ShipData ship, EnemyData[] _enemies);
+  event PlayerMove(uint256 positionX, uint256 positionyY);
+  event TurnComplete(uint256 turn, ShipData ship, EnemyData[] enemies);
 
   /*//////////////////////////////////////////////////////////////
                             CONSTRUCTOR
@@ -40,7 +40,7 @@ contract BigSky {
    require(state == State.ACTIVE, 'GAME NOT ACTIVE');
    
    _;
-  } 
+  }
 
   /*//////////////////////////////////////////////////////////////
                              GAME STATE
@@ -56,7 +56,8 @@ contract BigSky {
   uint72 public entropy; 
 
   uint72 public turn = 10;
-
+  uint256 public playerScore; 
+  
   struct ShipData {
     uint256 positionX;
     uint256 positionY;
@@ -75,6 +76,7 @@ contract BigSky {
   struct StarData {
     uint256 positionX;
     uint256 positionY;
+    bool isActive;
   }
   StarData[] public stars;
 
@@ -125,7 +127,7 @@ contract BigSky {
     for (uint256 i = 0; i <= 15; i++) {
       x = getRandomX(i); 
       y = getRandomY(i);
-      newStar = StarData({positionX: x, positionY: y});
+      newStar = StarData({positionX: x, positionY: y, isActive: true});
       stars.push(newStar); 
     } 
     emit StarLocations(stars);
@@ -143,6 +145,9 @@ contract BigSky {
       
       uint currentTurn = _turns;
       Ship currentShip = allShips[turn % PLAYERS_REQUIRED];
+      
+      currentShip.takeYourTurn();
+      enemyMove(currentTurn);
 
       emit TurnComplete(currentTurn, getShipData[currentShip], allEnemies);
     } 
@@ -152,16 +157,59 @@ contract BigSky {
     ShipData memory currentShip = getShipData[_ship];
 
     for (uint256 i = 0; i < enemies.length; i++) {
-        if (enemies[i].positionX == currentShip.positionX && enemies[i].positionY == currentShip.positionY){
+      if (enemies[i].positionX == currentShip.positionX && enemies[i].positionY == currentShip.positionY){
           state = State.DONE; 
         }
     }
+
+    for (uint256 j = 0; j < stars.length; j++) {
+      if (stars[j].positionX == currentShip.positionX && stars[j].positionY == currentShip.positionY){
+        if(stars[j].isActive == true)
+            playerScore += 5; 
+            stars[j].isActive == false;
+      }
+    }
   } 
+  
+  function enemyMove(uint _seed) internal {
+    uint256 rand = uint256(keccak256(abi.encodePacked(entropy * _seed))) % 4; 
+    
+    for(uint256 i = 0; i < enemies.length; i++){
+      uint256 x = enemies[i].positionX;
+      uint256 y = enemies[i].positionY;
+      
+      if(rand == 0){
+        if(enemies[i].positionX < 18){
+        enemies[i].positionX += 1;
+        }
+      } else if (rand == 1){
+        if(enemies[i].positionX > 0){
+        enemies[i].positionX -= 1;
+        }
+      } else if (rand == 2){
+        if(enemies[i].positionY < 12){
+        enemies[i].positionY += 1;
+        }
+      } else if (rand == 3){
+        if(enemies[i].positionY > 0){
+        enemies[i].positionY -= 1;
+        }
+      }
+    }
+  }
+
+  /*//////////////////////////////////////////////////////////////
+                            SHIP ACTIONS
+  //////////////////////////////////////////////////////////////*/
 
   /*//////////////////////////////////////////////////////////////
                                UTILS
   //////////////////////////////////////////////////////////////*/
 
+  function getAllShipDataAndFindShip(Ship shipToFind) public view returns(ShipData[] memory results, uint256 index){
+
+  } 
+ 
   function getRandomX(uint _seed) internal view returns(uint256){
     return uint(keccak256(abi.encodePacked(entropy * _seed))) % 12;
   } 
@@ -169,5 +217,5 @@ contract BigSky {
   function getRandomY(uint _seed) internal view returns(uint256){
     return uint(keccak256(abi.encodePacked(entropy * _seed))) % 17;
   }
-    
+
 }

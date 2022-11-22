@@ -202,36 +202,29 @@ contract BigSky {
   /*//////////////////////////////////////////////////////////////
                             SHIP ACTIONS
   //////////////////////////////////////////////////////////////*/
-  
-  enum Move{
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-  }
-  Move move;
 
-  function playerMove(Move _move, ShipData memory _mydata) internal {
-    if(_move == Move.UP){
-      require(_mydata.positionY + 1 < 17, "error");
-        _mydata.positionY + 1;
-      
+  function playerMove(uint8 _move) external {
+
+    ShipData storage ship = getShipData[Ship(msg.sender)]; 
+    
+    if(_move == 0){
+      require(ship.positionY + 1 < 17, "error");
+        ship.positionY + 1;
     } else 
-    if(_move == Move.DOWN){
-      require(_mydata.positionY - 1 > 0, "error");
-        _mydata.positionY - 1;
+    if(_move == 1){
+      require((ship.positionY - 1) > 0, "error");
+        ship.positionY - 1;
     } else 
-    if(_move == Move.LEFT){
-      require(_mydata.positionX - 1 > 0, "error");
-        _mydata.positionX - 1;
+    if(_move == 2){
+      require(ship.positionX - 1 > 0, "error");
+        ship.positionX - 1;
     } else
-    if(_move == Move.RIGHT){
-    require(_mydata.positionX + 1 < 12, "error");
-        _mydata.positionX - 1;
+    if(_move == 3){
+    require(ship.positionX + 1 < 12, "error");
+        ship.positionX - 1;
     }
   }
   
-
   /*//////////////////////////////////////////////////////////////
                                UTILS
   //////////////////////////////////////////////////////////////*/

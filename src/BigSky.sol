@@ -62,8 +62,6 @@ contract BigSky {
   uint72 public turn = 10;
   uint256 public playerScore; 
 
-  mapping(address => uint256) public playerHighScore;
- 
   /*//////////////////////////////////////////////////////////////
                                SHIP
   //////////////////////////////////////////////////////////////*/
@@ -75,6 +73,7 @@ contract BigSky {
   }
   Ship[] public ships;
 
+  // map ship contract to shipdata 
   mapping(Ship => ShipData) public getShipData;
   
   enum Actions {
@@ -163,35 +162,26 @@ contract BigSky {
       
       uint currentTurn = _turns;
       Ship currentShip = allShips[turn % PLAYERS_REQUIRED];
-      
-      uint256 INDEX = 0; // placeholder
-      currentShip.takeYourTurn(INDEX);
-      enemyMove(currentTurn);
+      ShipData memory playerShip = getShipData[currentShip];
+
+      currentShip.takeYourTurn(playerShip, allStars);
+
+      checkCollide(currentShip);
 
       emit TurnComplete(currentTurn, getShipData[currentShip], allEnemies);
     } 
-
-    if(playerScore > playerHighScore[msg.sender]){
-        playerScore = playerHighScore[msg.sender];
-    }
   }
 
   function checkCollide(Ship _ship) internal onlyDuringGame {
     ShipData memory currentShip = getShipData[_ship];
 
-    for (uint256 i = 0; i < enemies.length; i++) {
-      if (enemies[i].positionX == currentShip.positionX && 
-          enemies[i].positionY == currentShip.positionY){
-          state = State.DONE; 
-        }
-    }
-
     for (uint256 j = 0; j < stars.length; j++) {
       if (stars[j].positionX == currentShip.positionX && 
-          stars[j].positionY == currentShip.positionY){
-        if(stars[j].isActive == true)
+          stars[j].positionY == currentShip.positionY &&
+          stars[j].isActive == true){
             playerScore += 5; 
-            stars[j].isActive == false;
+            stars[j].isActive = false;
+            emit StarCaptured(playerScore);
       }
     }
   } 
@@ -230,23 +220,33 @@ contract BigSky {
   function playerMove(uint8 _move) external {
 
     ShipData storage ship = getShipData[Ship(msg.sender)]; 
-    
-    if(_move == 0){
-      require(ship.positionY + 1 < 17, "error");
-        ship.positionY + 1;
-    } else 
-    if(_move == 1){
-      require((ship.positionY - 1) > 0, "error");
-        ship.positionY - 1;
-    } else 
-    if(_move == 2){
-      require(ship.positionX - 1 > 0, "error");
-        ship.positionX - 1;
-    } else
-    if(_move == 3){
-    require(ship.positionX + 1 < 12, "error");
-        ship.positionX - 1;
-    }
+      
+      if(_move == 0){
+        require(ship.positionY + 1 < 17, "error");
+          ship.positionY + 1;
+      } else 
+      if(_move == 1){
+        require((ship.positionY - 1) > 0, "error");
+          ship.positionY - 1;
+      } else 
+      if(_move == 2){
+        require(ship.positionX - 1 > 0, "error");
+          ship.positionX - 1;
+      } else
+      if(_move == 3){
+      require(ship.positionX + 1 < 12, "error");
+          ship.positionX - 1;
+      }
+  }
+
+  function playerJump(uint72 _gridX, uint72 _gridY) external {
+    ShipData storage ship = getShipData[Ship(msg.sender)]; 
+
+    require(_gridX < 12 && _gridX > 0, 'out or range');
+    require(_gridY < 18 && _gridY > 0,'out of range');
+
+    ship.positionX = _gridX;
+    ship.positionY = _gridY;
   }
   
   /*//////////////////////////////////////////////////////////////

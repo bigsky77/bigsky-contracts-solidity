@@ -10,7 +10,9 @@ contract Ship {
     bigsky = _bigsky;
   }
 
-  function takeYourTurn(uint256 yourShipIndex) external  {
+  function takeYourTurn(BigSky.ShipData memory yourShip, BigSky.StarData[] memory allStars) external  {
+    uint256 x = yourShip.positionX;
+    uint256 y = yourShip.positionY;
   }
 
 }

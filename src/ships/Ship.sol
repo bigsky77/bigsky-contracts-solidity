@@ -13,6 +13,8 @@ contract Ship {
   function takeYourTurn(BigSky.ShipData memory yourShip, BigSky.StarData[] memory allStars) external  {
     uint256 x = yourShip.positionX;
     uint256 y = yourShip.positionY;
+    
+    if(x < 18) bigsky.playerMove(0);
   }
 
 }

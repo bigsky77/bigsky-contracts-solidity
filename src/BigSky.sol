@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import { Ship } from './ships/Ship.sol';
+import "../lib/solmate/src/utils/FixedPointMathLib.sol";
 
 contract BigSky {
   address immutable owner;
@@ -223,19 +224,19 @@ contract BigSky {
       
       if(_move == 0){
         require(ship.positionY + 1 < 17, "error");
-          ship.positionY + 1;
+          ship.positionY += 1;
       } else 
       if(_move == 1){
         require((ship.positionY - 1) > 0, "error");
-          ship.positionY - 1;
+          ship.positionY -= 1;
       } else 
       if(_move == 2){
         require(ship.positionX - 1 > 0, "error");
-          ship.positionX - 1;
+          ship.positionX += 1;
       } else
       if(_move == 3){
       require(ship.positionX + 1 < 12, "error");
-          ship.positionX - 1;
+          ship.positionX -= 1;
       }
   }
 

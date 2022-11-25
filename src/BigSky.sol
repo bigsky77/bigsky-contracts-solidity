@@ -17,9 +17,11 @@ contract BigSky {
 
   event GameStarted(State state);
 
+  event GameComplete(State state);
+
   event StarLocations(StarData[] _stars);
 
-  event TurnComplete(uint256 turn, ShipData ship, EnemyData[] enemies, StarData[] allStars);
+  event TurnComplete(uint256 turn, uint256 playerScore, ShipData ship, EnemyData[] enemies, StarData[] allStars);
 
   event StarCaptured(uint256 playerScore);
 
@@ -119,7 +121,12 @@ contract BigSky {
     getShipData[ship] = ShipData({positionX: x, positionY: y, ship: ship});
     ships.push(ship);
 
-    entropy = uint72(block.timestamp);
+
+    if(PLAYERS_REQUIRED == ships.length){
+         entropy = uint72(block.timestamp);
+         
+         state = State.ACTIVE;
+    }
 
     emit ShipRegistered(0, ship);
   }
@@ -166,15 +173,25 @@ contract BigSky {
       ShipData memory playerShip = getShipData[currentShip];
 
       currentShip.takeYourTurn(playerShip, allStars);
+      enemyMove(currentTurn);
 
       checkCollide(currentShip);
 
-      emit TurnComplete(currentTurn, getShipData[currentShip], allEnemies, allStars);
+      emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allEnemies, allStars);
     } 
+    state = State.DONE;
+    emit GameComplete(state);
   }
 
   function checkCollide(Ship _ship) internal onlyDuringGame {
     ShipData memory currentShip = getShipData[_ship];
+
+    for (uint256 j = 0; j < enemies.length; j++) {
+      if (enemies[j].positionX == currentShip.positionX && 
+          enemies[j].positionY == currentShip.positionY ){
+            playerScore -= 5; 
+      }
+    }
 
     for (uint256 j = 0; j < stars.length; j++) {
       if (stars[j].positionX == currentShip.positionX && 

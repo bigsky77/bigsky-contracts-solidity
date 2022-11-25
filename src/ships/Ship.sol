@@ -15,6 +15,8 @@ contract Ship {
     uint256 y = yourShip.positionY;
     
     if(x < 18) bigsky.playerMove(0);
+    if(x < 10) bigsky.playerMove(2); 
+    
   }
 
 }

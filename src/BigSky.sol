@@ -19,7 +19,7 @@ contract BigSky {
 
   event StarLocations(StarData[] _stars);
 
-  event TurnComplete(uint256 turn, ShipData ship, EnemyData[] enemies);
+  event TurnComplete(uint256 turn, ShipData ship, EnemyData[] enemies, StarData[] allStars);
 
   event StarCaptured(uint256 playerScore);
 
@@ -169,7 +169,7 @@ contract BigSky {
 
       checkCollide(currentShip);
 
-      emit TurnComplete(currentTurn, getShipData[currentShip], allEnemies);
+      emit TurnComplete(currentTurn, getShipData[currentShip], allEnemies, allStars);
     } 
   }
 

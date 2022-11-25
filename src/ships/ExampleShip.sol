@@ -2,15 +2,13 @@
 pragma solidity 0.8.13;
 
 import "../BigSky.sol";
+import "./Ship.sol";
 
-contract Ship {
-  BigSky internal immutable bigsky; 
+contract ExampleShip is Ship {
 
-  constructor(BigSky _bigsky) {
-    bigsky = _bigsky;
-  }
+  constructor(BigSky _bigsky) Ship(bigsky){}
 
-  function takeYourTurn(BigSky.ShipData memory yourShip, BigSky.StarData[] memory allStars) external virtual  {
+  function takeYourTurn(BigSky.ShipData memory yourShip, BigSky.StarData[] memory allStars) external override  {
     uint256 x = yourShip.positionX;
     uint256 y = yourShip.positionY;
     

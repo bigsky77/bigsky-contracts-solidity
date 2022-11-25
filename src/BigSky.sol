@@ -101,7 +101,7 @@ contract BigSky {
                                SETUP
   //////////////////////////////////////////////////////////////*/
 
-  function startGame() public {
+  function startGame() internal {
     state = State.ACTIVE;
     
     setEnemies();
@@ -111,7 +111,7 @@ contract BigSky {
     emit GameStarted(state);
   }
 
-  function registerPlayer(Ship ship) public {
+  function launchShip(Ship ship) public {
     require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
     state = State.WAITING;
     
@@ -121,14 +121,8 @@ contract BigSky {
     getShipData[ship] = ShipData({positionX: x, positionY: y, ship: ship});
     ships.push(ship);
 
-
-    if(PLAYERS_REQUIRED == ships.length){
-         entropy = uint72(block.timestamp);
-         
-         state = State.ACTIVE;
-    }
-
-    emit ShipRegistered(0, ship);
+    entropy = uint72(block.timestamp);
+    startGame();
   }
   
   function setEnemies() internal {
@@ -179,6 +173,7 @@ contract BigSky {
 
       emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allEnemies, allStars);
     } 
+
     state = State.DONE;
     emit GameComplete(state);
   }

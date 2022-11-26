@@ -157,7 +157,7 @@ contract BigSky {
                                 GAME
   //////////////////////////////////////////////////////////////*/
 
-  function play(uint256 _turns) internal onlyDuringGame {
+  function play(uint256 _turns) internal {
     for(; _turns != 0; _turns--){
       Ship[] memory allShips = ships;
       EnemyData[] memory allEnemies = enemies;
@@ -168,7 +168,7 @@ contract BigSky {
       ShipData memory playerShip = getShipData[currentShip];
 
       currentShip.takeYourTurn(playerShip, allStars);
-      enemyMove(currentTurn);
+      //enemyMove(currentTurn);
 
       checkCollide(currentShip);
 
@@ -184,9 +184,13 @@ contract BigSky {
 
     for (uint256 j = 0; j < enemies.length; j++) {
       if (enemies[j].positionX == currentShip.positionX && 
-          enemies[j].positionY == currentShip.positionY ){
-            playerScore -= 5; 
-      }
+          enemies[j].positionY == currentShip.positionY){
+            if((playerScore - 5) > 5){
+              playerScore -= 5;
+            } else {
+              playerScore == 0;
+            } 
+        }
     }
 
     for (uint256 j = 0; j < stars.length; j++) {
@@ -280,12 +284,12 @@ contract BigSky {
       
       else 
       if(_move == 3){
-        if((ship.positionX - 1) == 0){
+        if((ship.positionX - 1) <= 1){
           ship.positionX = 12;
         } else {
           ship.positionX -= 1;
         } 
-    } 
+     } 
   }
 
   function playerJump(uint72 _gridX, uint72 _gridY) external {
@@ -303,11 +307,11 @@ contract BigSky {
   //////////////////////////////////////////////////////////////*/
 
   function getRandomX(uint _seed) internal view returns(uint256){
-    return uint(keccak256(abi.encodePacked(entropy * _seed))) % 12;
+    return uint(keccak256(abi.encodePacked(entropy * _seed))) % 17;
   } 
 
   function getRandomY(uint _seed) internal view returns(uint256){
-    return uint(keccak256(abi.encodePacked(entropy * _seed))) % 17;
+    return uint(keccak256(abi.encodePacked(entropy * _seed))) % 12;
   }
 
 }

@@ -115,13 +115,14 @@ contract BigSky {
     require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
     state = State.WAITING;
     
+    entropy = uint72(block.timestamp);
+
     uint256 x = getRandomX(entropy);
     uint256 y = getRandomY(entropy);
 
     getShipData[ship] = ShipData({positionX: x, positionY: y, ship: ship});
     ships.push(ship);
 
-    entropy = uint72(block.timestamp);
     startGame();
   }
   
@@ -163,7 +164,7 @@ contract BigSky {
       StarData[] memory allStars = stars;
       
       uint currentTurn = _turns;
-      Ship currentShip = allShips[turn % PLAYERS_REQUIRED];
+      Ship currentShip = allShips[ships.length - 1];
       ShipData memory playerShip = getShipData[currentShip];
 
       currentShip.takeYourTurn(playerShip, allStars);
@@ -207,20 +208,37 @@ contract BigSky {
       uint256 y = enemies[i].positionY;
       
       if(rand == 0){
-        if(enemies[i].positionX < 18){
-        enemies[i].positionX += 1;
+        if((enemies[i].positionX + 1) > 12){
+          enemies[i].positionX = 0;
+        } else {
+          enemies[i].positionX += 1;
         }
-      } else if (rand == 1){
-        if(enemies[i].positionX > 0){
-        enemies[i].positionX -= 1;
+      } 
+      
+      else 
+      if(rand == 1){
+       if((enemies[i].positionX - 1) == 0){
+          enemies[i].positionX = 12;
+        } else {
+          enemies[i].positionX -= 1;
         }
-      } else if (rand == 2){
-        if(enemies[i].positionY < 12){
-        enemies[i].positionY += 1;
+      } 
+
+      else 
+      if (rand == 2){
+       if((enemies[i].positionY + 1) > 17){
+          enemies[i].positionY = 0;
+        } else {
+          enemies[i].positionY += 1;
         }
-      } else if (rand == 3){
-        if(enemies[i].positionY > 0){
-        enemies[i].positionY -= 1;
+      } 
+
+      else 
+      if (rand == 3){
+        if((enemies[i].positionY - 1) == 0){
+          enemies[i].positionY = 17;
+        } else {
+          enemies[i].positionY -= 1;
         }
       }
     }
@@ -235,21 +253,39 @@ contract BigSky {
     ShipData storage ship = getShipData[Ship(msg.sender)]; 
       
       if(_move == 0){
-        require(ship.positionY + 1 < 17, "error");
+        if(ship.positionY + 1 > 17){
+          ship.positionY = 0;
+        } else {
           ship.positionY += 1;
-      } else 
+        } 
+      } 
+
+      else 
       if(_move == 1){
-        require((ship.positionY - 1) > 0, "error");
+        if((ship.positionY - 1) == 0){
+          ship.positionY = 17;
+        } else {
           ship.positionY -= 1;
-      } else 
+        } 
+      } 
+      
+      else 
       if(_move == 2){
-        require(ship.positionX - 1 > 0, "error");
+        if((ship.positionX + 1) > 12){
+          ship.positionX = 0;
+        } else {
           ship.positionX += 1;
-      } else
+        } 
+      } 
+      
+      else 
       if(_move == 3){
-      require(ship.positionX + 1 < 12, "error");
+        if((ship.positionX - 1) == 0){
+          ship.positionX = 12;
+        } else {
           ship.positionX -= 1;
-      }
+        } 
+    } 
   }
 
   function playerJump(uint72 _gridX, uint72 _gridY) external {

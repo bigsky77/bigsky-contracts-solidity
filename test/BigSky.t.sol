@@ -19,12 +19,6 @@ contract BigSkyTest is Test {
     function testGame() public {
         Ship ship = new Ship(bigsky);
         bigsky.launchShip(ship);
-        
-        Ship ship2 = new Ship(bigsky);
-        bigsky.launchShip(ship2);
-        
-        Ship exampleship = new Ship(bigsky);
-        bigsky.launchShip(exampleship);
    }
 
     

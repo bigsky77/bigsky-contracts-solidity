@@ -8,6 +8,7 @@ contract BigSky {
   address immutable owner;
 
   uint72 internal constant PLAYERS_REQUIRED = 1;
+  mapping(address => uint256) public playerHighScore;
 
   /*//////////////////////////////////////////////////////////////
                                EVENTS
@@ -62,7 +63,7 @@ contract BigSky {
 
   uint72 public entropy; 
 
-  uint72 public turn = 10;
+  uint72 public turn = 30;
   uint256 public playerScore; 
 
   /*//////////////////////////////////////////////////////////////
@@ -112,7 +113,7 @@ contract BigSky {
   }
 
   function launchShip(Ship ship) public {
-    require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
+//    require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
     state = State.WAITING;
     
     entropy = uint72(block.timestamp);
@@ -168,7 +169,6 @@ contract BigSky {
       ShipData memory playerShip = getShipData[currentShip];
 
       currentShip.takeYourTurn(playerShip, allStars);
-      //enemyMove(currentTurn);
 
       checkCollide(currentShip);
 
@@ -176,22 +176,16 @@ contract BigSky {
     } 
 
     state = State.DONE;
+    
+    if(playerScore > playerHighScore[msg.sender]){
+      playerScore = playerHighScore[msg.sender];
+    }
+
     emit GameComplete(state);
   }
 
   function checkCollide(Ship _ship) internal onlyDuringGame {
     ShipData memory currentShip = getShipData[_ship];
-
-    for (uint256 j = 0; j < enemies.length; j++) {
-      if (enemies[j].positionX == currentShip.positionX && 
-          enemies[j].positionY == currentShip.positionY){
-            if((playerScore - 5) > 5){
-              playerScore -= 5;
-            } else {
-              playerScore == 0;
-            } 
-        }
-    }
 
     for (uint256 j = 0; j < stars.length; j++) {
       if (stars[j].positionX == currentShip.positionX && 
@@ -213,7 +207,7 @@ contract BigSky {
       
       if(rand == 0){
         if((enemies[i].positionX + 1) > 12){
-          enemies[i].positionX = 0;
+          enemies[i].positionX = 1;
         } else {
           enemies[i].positionX += 1;
         }
@@ -221,7 +215,7 @@ contract BigSky {
       
       else 
       if(rand == 1){
-       if((enemies[i].positionX - 1) == 0){
+       if((enemies[i].positionX - 1) <= 1){
           enemies[i].positionX = 12;
         } else {
           enemies[i].positionX -= 1;
@@ -231,7 +225,7 @@ contract BigSky {
       else 
       if (rand == 2){
        if((enemies[i].positionY + 1) > 17){
-          enemies[i].positionY = 0;
+          enemies[i].positionY = 1;
         } else {
           enemies[i].positionY += 1;
         }
@@ -239,7 +233,7 @@ contract BigSky {
 
       else 
       if (rand == 3){
-        if((enemies[i].positionY - 1) == 0){
+        if((enemies[i].positionY - 1) <= 1){
           enemies[i].positionY = 17;
         } else {
           enemies[i].positionY -= 1;
@@ -266,7 +260,7 @@ contract BigSky {
 
       else 
       if(_move == 1){
-        if((ship.positionY - 1) == 0){
+        if((ship.positionY - 1) <= 1){
           ship.positionY = 17;
         } else {
           ship.positionY -= 1;
@@ -313,5 +307,13 @@ contract BigSky {
   function getRandomY(uint _seed) internal view returns(uint256){
     return uint(keccak256(abi.encodePacked(entropy * _seed))) % 12;
   }
+  
+  function getHighScore(address _player) external view returns(uint256){
+    return playerHighScore[_player];
+  }   
 
 }
+
+
+
+

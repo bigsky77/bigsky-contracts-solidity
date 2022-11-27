@@ -11,10 +11,9 @@ contract Ship {
   }
 
   function takeYourTurn(BigSky.ShipData memory yourShip, BigSky.StarData[] memory allStars) external virtual  {
+    
     bigsky.playerMove(0);    
-
-    if(yourShip.positionX > 10) bigsky.playerMove(2);
-
+      
   }
 
 }

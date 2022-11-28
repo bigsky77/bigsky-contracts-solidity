@@ -129,7 +129,7 @@ contract BigSky {
       Ship currentShip = allShips[ships.length - 1];
       ShipData memory playerShip = getShipData[currentShip];
 
-      currentShip.takeYourTurn(playerShip, allStars);
+      currentShip.takeYourTurn{gas: 2_000_000}(playerShip, allStars);
 
       checkCollide(currentShip);
 

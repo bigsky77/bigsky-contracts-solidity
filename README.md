@@ -1,0 +1,41 @@
+## BigSky 
+
+BigSky is an Ethereum based game.  Players compete by programming the logic for individual space-ships.  When a player launches a ship, their ship design is submitted to the master contract.  The master contract then runs the ship logic againgst a randomly generated scenario.  
+
+Example ships can be found in the 'src/ships' folder.
+
+### Installation
+
+Make sure you have Foundry installed.  
+
+Clone the repository into the folder of your choice.  
+
+```sh
+gh repo clone bigsky77/bigsky-contracts
+```
+
+Compile and test the codebase.
+
+```sh
+Forge Build
+Forge Test -vvv
+```
+
+To deploy a local development version of the contracts.  
+
+```sh
+forge script script/DeployBigSky.s.sol:DeployBigSky --fork-url http://localhost:8545  --private-key<YOUR_PRIVATE_KEY> --broadcast
+```
+
+### How to Play
+
+BigSky can be played either on the platform's native website [bigsky.gg](bigsky.gg) or by using your favorite block-explorer.
+
+Following the sample ship example.  Program any set of move's for your ship.  Every turn your ship will take those moves following any logic that you have written in the Ship contract.  You can write tests for your ship by using the '/test' folder. 
+
+Once you are ready deploy your ship to the TBD block-chain.  Make sure you pass the address for the BigSky contract into your ship's constructor.
+
+
+
+
+

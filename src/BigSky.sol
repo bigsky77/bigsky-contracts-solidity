@@ -7,9 +7,13 @@ import "../lib/solmate/src/utils/SafeCastLib.sol";
 contract BigSky {
   using SafeCastLib for uint256;
   
-    using SafeCastLib for uint256;
   uint72 internal constant PLAYERS_REQUIRED = 1;
+
+  uint72 internal constant rangeX = 15;
+  uint72 internal constant rangeY = 9;
+  
   mapping(address => uint256) public playerHighScore;
+  mapping(address => uint256) public gamesPlayed;
 
   /*//////////////////////////////////////////////////////////////
                                EVENTS
@@ -19,9 +23,9 @@ contract BigSky {
 
   event GameStarted(State state);
 
-  event GameComplete(State state);
-
   event TurnComplete(uint256 turn, uint256 playerScore, ShipData ships, StarData[] allStars);
+
+  event GameOver(uint256 score, uint256 highScore, uint256 starsCaptured, uint256 gamesPlayed);
 
   event StarCaptured(uint256 playerScore);
 
@@ -63,7 +67,6 @@ contract BigSky {
   struct ShipData {
     uint256 positionX;
     uint256 positionY;
-    uint256 balance;
     Ship ship;
   }
   Ship[] public ships;
@@ -82,25 +85,19 @@ contract BigSky {
                                SETUP
   //////////////////////////////////////////////////////////////*/
 
-  function startGame() internal {
-    setStars();
-
-    play(turn);
-    emit GameStarted(state);
-  }
-
   function launchShip(Ship ship) public {
-//    require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
+  // require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
     
     entropy = uint72(block.timestamp);
+    setStars();
 
     uint256 x = getRandomX(entropy);
     uint256 y = getRandomY(entropy);
 
-    getShipData[ship] = ShipData({positionX: x, positionY: y, balance: 100, ship: ship});
+    getShipData[ship] = ShipData({positionX: x, positionY: y, ship: ship});
     ships.push(ship);
 
-    startGame();
+    play(turn);
   }
   
   function setStars() internal {
@@ -138,10 +135,19 @@ contract BigSky {
     } 
 
     if(playerScore > playerHighScore[msg.sender]){
-      playerScore = playerHighScore[msg.sender];
+       playerScore = playerHighScore[msg.sender];
     }
+    
+    uint256 starsCaptured;
+    for(uint256 i = 0; i < stars.length; i++){
+      if(stars[i].isActive != true){
+        starsCaptured += 1;
+      }
+    }
+    
+    gamesPlayed[msg.sender] += 1;
 
-    emit GameComplete(state);
+    emit GameOver(playerScore, playerHighScore[msg.sender], starsCaptured, gamesPlayed[msg.sender]);
   }
 
   function checkCollide(Ship _ship) internal  {
@@ -151,7 +157,6 @@ contract BigSky {
       if (stars[j].positionX == currentShip.positionX && 
           stars[j].positionY == currentShip.positionY &&
           stars[j].isActive == true){
-            currentShip.balance += 10;
             playerScore += 5; 
             stars[j].isActive = false;
             emit StarCaptured(playerScore);
@@ -164,14 +169,11 @@ contract BigSky {
   //////////////////////////////////////////////////////////////*/
 
   function playerMove(uint8 _move) external {
-    uint256 cost = 1;
 
     ShipData storage ship = getShipData[Ship(msg.sender)]; 
-    ship.balance -= cost.safeCastTo32();
-    ship.balance -= cost;
 
       if(_move == 0){
-        if(ship.positionY + 1 > 12){
+        if(ship.positionY + 1 > rangeY){
           ship.positionY = 0;
         } else {
           ship.positionY += 1;
@@ -181,7 +183,7 @@ contract BigSky {
       else 
       if(_move == 1){
         if((ship.positionY - 1) <= 1){
-          ship.positionY = 12;
+          ship.positionY = rangeY;
         } else {
           ship.positionY -= 1;
         } 
@@ -189,7 +191,7 @@ contract BigSky {
       
       else 
       if(_move == 2){
-        if((ship.positionX + 1) > 17){
+        if((ship.positionX + 1) > rangeX){
           ship.positionX = 0;
         } else {
           ship.positionX += 1;
@@ -199,7 +201,7 @@ contract BigSky {
       else 
       if(_move == 3){
         if((ship.positionX - 1) <= 1){
-          ship.positionX = 17;
+          ship.positionX = rangeX;
         } else {
           ship.positionX -= 1;
         } 
@@ -211,11 +213,11 @@ contract BigSky {
   //////////////////////////////////////////////////////////////*/
 
   function getRandomX(uint _seed) internal view returns(uint256){
-    return uint(keccak256(abi.encodePacked(entropy * _seed))) % 17;
+    return uint(keccak256(abi.encodePacked(entropy * _seed))) % rangeX;
   } 
 
   function getRandomY(uint _seed) internal view returns(uint256){
-    return uint(keccak256(abi.encodePacked(entropy * _seed))) % 12;
+    return uint(keccak256(abi.encodePacked(entropy * _seed))) % rangeY;
   }
   
 }

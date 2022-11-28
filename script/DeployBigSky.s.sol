@@ -13,5 +13,17 @@ contract DeployBigSky is Script {
 
         BigSky bigsky = new BigSky();
         Ship ship = new Ship(bigsky);
+        
+        Ship ship2 = new Ship(bigsky);
+        bigsky.launchShip(ship2);
+
+        Ship ship3 = new Ship(bigsky);
+        bigsky.launchShip(ship3);
+        
+        Ship ship4 = new Ship(bigsky);
+        bigsky.launchShip(ship4);
+        
+        Ship ship5 = new Ship(bigsky);
+        bigsky.launchShip(ship5);
     }
 }

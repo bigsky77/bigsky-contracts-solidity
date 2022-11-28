@@ -11,6 +11,7 @@ contract BigSky {
 
   uint72 internal constant rangeX = 15;
   uint72 internal constant rangeY = 9;
+  uint72 internal constant startingBalance = 100;
   
   mapping(address => uint256) public playerHighScore;
   mapping(address => uint256) public gamesPlayed;
@@ -67,6 +68,7 @@ contract BigSky {
   struct ShipData {
     uint256 positionX;
     uint256 positionY;
+    uint256 balance;
     Ship ship;
   }
   Ship[] public ships;
@@ -94,7 +96,7 @@ contract BigSky {
     uint256 x = getRandomX(entropy);
     uint256 y = getRandomY(entropy);
 
-    getShipData[ship] = ShipData({positionX: x, positionY: y, ship: ship});
+    getShipData[ship] = ShipData({positionX: x, positionY: y, balance: startingBalance, ship: ship});
     ships.push(ship);
 
     play(turn);
@@ -135,7 +137,8 @@ contract BigSky {
     } 
 
     if(playerScore > playerHighScore[msg.sender]){
-       playerScore = playerHighScore[msg.sender];
+        uint256 newHighScore = playerScore; 
+        playerHighScore[msg.sender] = newHighScore;
     }
     
     uint256 starsCaptured;
@@ -169,8 +172,8 @@ contract BigSky {
   //////////////////////////////////////////////////////////////*/
 
   function playerMove(uint8 _move) external {
-
     ShipData storage ship = getShipData[Ship(msg.sender)]; 
+    require((ship.balance - 1 > 1), "not enough tokens");
 
       if(_move == 0){
         if(ship.positionY + 1 > rangeY){
@@ -205,7 +208,9 @@ contract BigSky {
         } else {
           ship.positionX -= 1;
         } 
-     } 
+     }
+
+     ship.balance -= 1;
   }
 
   /*//////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 ## BigSky 
 
-BigSky is an Ethereum based game.  Players compete by programming the logic for individual space-ships.  When a player launches a ship, their ship design is submitted to the master contract.  The master contract then runs the ship logic againgst a randomly generated scenario.  
+BigSky is an ethereum based developer game.  Players compete by programming the logic for individual space-ships.  When a player launches a ship, their ship design is submitted to the master contract.  The master contract then runs the ship logic againgst a randomly generated scenario.  The goal of the ship is to collect as many stars as possible. 
 
 Example ships can be found in the 'src/ships' folder.
 

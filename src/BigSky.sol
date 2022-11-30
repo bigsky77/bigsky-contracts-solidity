@@ -13,9 +13,6 @@ contract BigSky {
   uint72 internal constant rangeY = 9;
   uint72 internal constant startingBalance = 100;
   
-  mapping(address => uint256) public playerHighScore;
-  mapping(address => uint256) public gamesPlayed;
-
   /*//////////////////////////////////////////////////////////////
                                EVENTS
   //////////////////////////////////////////////////////////////*/
@@ -26,7 +23,7 @@ contract BigSky {
 
   event TurnComplete(uint256 turn, uint256 playerScore, ShipData ships, StarData[] allStars);
 
-  event GameOver(uint256 score, uint256 highScore, uint256 starsCaptured, uint256 gamesPlayed);
+  event GameOver(address playerAddress, uint256 score, uint256 highScore, uint256 starsCaptured, uint256 gamesPlayed);
 
   event StarCaptured(uint256 playerScore);
 
@@ -64,6 +61,18 @@ contract BigSky {
   /*//////////////////////////////////////////////////////////////
                                SHIP
   //////////////////////////////////////////////////////////////*/
+  
+  struct PlayerData {
+    uint256 highScore;
+    uint256 gamesPlayed;
+    uint256 starsCaptured;
+    uint256 index;
+    address playerAddress;
+  }
+  PlayerData[] players;
+  
+  // map player address to game data
+  mapping(address => PlayerData) public getPlayerData;
 
   struct ShipData {
     uint256 positionX;
@@ -89,7 +98,9 @@ contract BigSky {
 
   function launchShip(Ship ship) public {
   // require(address(getShipData[ship].ship) == address(0), "DOUBLE_REGISTER");
-    
+    PlayerData memory player = getPlayerData[msg.sender];
+    player.playerAddress = address(msg.sender);
+
     entropy = uint72(block.timestamp);
     setStars();
 
@@ -136,21 +147,24 @@ contract BigSky {
       emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allStars);
     } 
 
-    if(playerScore > playerHighScore[msg.sender]){
+    PlayerData storage player = getPlayerData[address(msg.sender)];
+
+    if(playerScore > player.highScore){
         uint256 newHighScore = playerScore; 
-        playerHighScore[msg.sender] = newHighScore;
+        player.highScore = newHighScore;
     }
     
     uint256 starsCaptured;
     for(uint256 i = 0; i < stars.length; i++){
       if(stars[i].isActive != true){
         starsCaptured += 1;
+        player.starsCaptured += 1;
       }
     }
     
-    gamesPlayed[msg.sender] += 1;
+    player.gamesPlayed += 1;
 
-    emit GameOver(playerScore, playerHighScore[msg.sender], starsCaptured, gamesPlayed[msg.sender]);
+    emit GameOver(address(msg.sender), playerScore, player.highScore, starsCaptured, player.gamesPlayed);
   }
 
   function checkCollide(Ship _ship) internal  {

@@ -1,8 +1,15 @@
 ## BigSky 
 
+
+https://user-images.githubusercontent.com/77446076/205087423-01516b7d-18d8-4087-8530-4d07652f77fe.mov
+
 BigSky is an ethereum based developer game.  Players compete by programming the logic for individual space-ships.  When a player launches a ship, their ship design is submitted to the master contract.  The master contract then runs the ship logic againgst a randomly generated scenario.  The goal of the ship is to collect as many stars as possible. 
 
 Example ships can be found in the 'src/ships' folder.
+
+### Status
+
+BigSky is full playable with all basic game mechanics in place.  This project is still in heavy development.  Expect multiple iterations on the core smart contracts over the next month.
 
 ### Installation
 

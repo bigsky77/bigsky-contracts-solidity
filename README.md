@@ -36,7 +36,7 @@ forge script script/DeployBigSky.s.sol:DeployBigSky --fork-url http://localhost:
 
 ### How to Play
 
-BigSky can be played either on the platform's native website [bigsky.gg](bigsky.gg) or by using your favorite block-explorer.
+BigSky can be played either on the platform's native website [bigsky.gg](https://bigsky.gg) or by using your favorite block-explorer.
 
 Following the sample ship example.  Program any set of move's for your ship.  Every turn your ship will take those moves following any logic that you have written in the Ship contract.  You can write tests for your ship by using the '/test' folder. 
 

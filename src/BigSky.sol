@@ -3,11 +3,11 @@ pragma solidity ^0.8.13;
 
 import { Ship } from './ships/Ship.sol';
 import "../lib/solmate/src/utils/SafeCastLib.sol";
-`
+
 contract BigSky {
   using SafeCastLib for uint256;
   
-  uint72 internal constant PLAYERS_REQUIRED = 1;
+  uint72 internal constant PLAYERS_REQUIRED = 3;
 
   uint72 internal constant rangeX = 15;
   uint72 internal constant rangeY = 9;
@@ -26,17 +26,12 @@ contract BigSky {
   event GameOver(address playerAddress, uint256 score, uint256 highScore, uint256 starsCaptured, uint256 gamesPlayed);
 
   event StarCaptured(uint256 playerScore);
-
-  /*//////////////////////////////////////////////////////////////
-                            CONSTRUCTOR
-  //////////////////////////////////////////////////////////////*/
-
   
   /*//////////////////////////////////////////////////////////////
                               MODIFIERS
   //////////////////////////////////////////////////////////////*/
 
-   modifier onlyDuringGame() {
+   modifier onlyDuringActiveGame() {
    require(state == State.ACTIVE, 'GAME NOT ACTIVE');
    
    _;
@@ -101,7 +96,6 @@ contract BigSky {
     PlayerData memory player = getPlayerData[msg.sender];
     player.playerAddress = address(msg.sender);
 
-    entropy = uint72(block.timestamp);
     setStars();
 
     uint256 x = getRandomX(entropy);
@@ -110,7 +104,14 @@ contract BigSky {
     getShipData[ship] = ShipData({positionX: x, positionY: y, balance: startingBalance, ship: ship});
     ships.push(ship);
 
-    play(turn);
+    uint256 totalships = ships.length; 
+
+    if(totalships == PLAYERS_REQUIRED){
+      entropy = uint72(block.timestamp);
+
+      state = State.ACTIVE; 
+    } else require(totalships < PLAYERS_REQUIRED, "not enough players");
+
   }
   
   function setStars() internal {
@@ -130,7 +131,7 @@ contract BigSky {
                                 GAME
   //////////////////////////////////////////////////////////////*/
 
-  function play(uint256 _turns) internal {
+  function play(uint256 _turns) external onlyDuringActiveGame {
 
     for(; _turns != 0; _turns--){
       Ship[] memory allShips = ships;

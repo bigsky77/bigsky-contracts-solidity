@@ -11,11 +11,23 @@ contract BigSkyTest is Test {
 
     function setUp() public {
         bigsky = new BigSky();
+
     }
     
     function testGame() public {
-        Ship ship = new Ship(bigsky);
-        bigsky.launchShip(ship);
-        
+        Ship ship1 = new Ship(bigsky);
+        vm.label(address(ship1), "ship 1");
+
+        Ship ship2 = new Ship(bigsky);
+        vm.label(address(ship2), "ship 2");
+
+        Ship ship3 = new Ship(bigsky);
+        vm.label(address(ship3), "ship 3");
+
+        bigsky.launchShip(ship1);
+        bigsky.launchShip(ship2);
+        bigsky.launchShip(ship3);
+
+        bigsky.play(30);
     }
 }

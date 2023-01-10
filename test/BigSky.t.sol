@@ -28,6 +28,5 @@ contract BigSkyTest is Test {
         bigsky.launchShip(ship2);
         bigsky.launchShip(ship3);
 
-        bigsky.play(30);
     }
 }

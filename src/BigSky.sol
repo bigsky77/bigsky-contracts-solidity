@@ -7,7 +7,7 @@ import "../lib/solmate/src/utils/SafeCastLib.sol";
 contract BigSky {
   using SafeCastLib for uint256;
   
-  uint72 internal constant PLAYERS_REQUIRED = 3;
+  uint72 internal constant PLAYERS_REQUIRED = 1;
 
   uint72 internal constant rangeX = 15;
   uint72 internal constant rangeY = 9;
@@ -96,7 +96,6 @@ contract BigSky {
     PlayerData memory player = getPlayerData[msg.sender];
     player.playerAddress = address(msg.sender);
 
-    setStars();
 
     uint256 x = getRandomX(entropy);
     uint256 y = getRandomY(entropy);
@@ -106,22 +105,23 @@ contract BigSky {
 
     uint256 totalships = ships.length; 
 
-    if(totalships == PLAYERS_REQUIRED){
-      entropy = uint72(block.timestamp);
-
-      state = State.ACTIVE; 
-    } else require(totalships < PLAYERS_REQUIRED, "not enough players");
+    //if(totalships == PLAYERS_REQUIRED){
+    entropy = uint72(block.timestamp);
+    setStars(entropy);
+    state = State.ACTIVE; 
+    play(turn);
+    //} else require(totalships < PLAYERS_REQUIRED, "not enough players");
 
   }
   
-  function setStars() internal {
+  function setStars(uint72 _entropy) internal {
     uint256 x;
     uint256 y;
     StarData memory newStar;
 
     for (uint256 i = 0; i < 16; i++) {
-      x = getRandomX(i); 
-      y = getRandomY(i);
+      x = getRandomX(_entropy * i); 
+      y = getRandomY(_entropy * i);
       newStar = StarData({positionX: x, positionY: y, isActive: true});
       stars.push(newStar); 
     } 
@@ -131,7 +131,7 @@ contract BigSky {
                                 GAME
   //////////////////////////////////////////////////////////////*/
 
-  function play(uint256 _turns) external onlyDuringActiveGame {
+  function play(uint256 _turns) internal onlyDuringActiveGame {
 
     for(; _turns != 0; _turns--){
       Ship[] memory allShips = ships;

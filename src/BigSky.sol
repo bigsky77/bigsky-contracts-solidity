@@ -21,7 +21,7 @@ contract BigSky {
 
   event GameStarted(State state);
 
-  event TurnComplete(uint256 turn, uint256 playerScore, ShipData ships, StarData[] allStars);
+  event TurnComplete(uint256 turn, uint256 playerScore, ShipData ships, StarData[] allStars, EnemyData[] allEnemies);
 
   event GameOver(address playerAddress, uint256 score, uint256 highScore, uint256 starsCaptured, uint256 gamesPlayed);
 
@@ -86,6 +86,13 @@ contract BigSky {
     bool isActive;
   }
   StarData[] public stars;
+  
+  struct EnemyData {
+    uint256 positionX;
+    uint256 positionY;
+    bool isActive;
+  }
+  EnemyData[] public enemies;
 
   /*//////////////////////////////////////////////////////////////
                                SETUP
@@ -107,7 +114,10 @@ contract BigSky {
 
     //if(totalships == PLAYERS_REQUIRED){
     entropy = uint72(block.timestamp);
+    
     setStars(entropy);
+    setEnemies(entropy);
+
     state = State.ACTIVE; 
     play(turn);
     //} else require(totalships < PLAYERS_REQUIRED, "not enough players");
@@ -127,6 +137,19 @@ contract BigSky {
     } 
   }
 
+  function setEnemies(uint72 _entropy) internal {
+    uint256 x;
+    uint256 y;
+    EnemyData memory newEnemy;
+
+    for (uint256 i = 0; i < 2; i++) {
+      x = getRandomX(_entropy * i);
+      y = getRandomY(_entropy * i);
+      newEnemy = EnemyData({positionX: x, positionY: y, isActive: true});
+      enemies.push(newEnemy);
+    }
+  }
+
   /*//////////////////////////////////////////////////////////////
                                 GAME
   //////////////////////////////////////////////////////////////*/
@@ -136,6 +159,7 @@ contract BigSky {
     for(; _turns != 0; _turns--){
       Ship[] memory allShips = ships;
       StarData[] memory allStars = stars;
+      EnemyData[] memory allEnemies = enemies;
       
       uint currentTurn = _turns;
       Ship currentShip = allShips[ships.length - 1];
@@ -145,7 +169,7 @@ contract BigSky {
 
       checkCollide(currentShip);
 
-      emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allStars);
+      emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allStars, allEnemies);
     } 
 
     PlayerData storage player = getPlayerData[address(msg.sender)];

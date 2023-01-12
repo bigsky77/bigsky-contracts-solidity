@@ -9,11 +9,10 @@ import "../src/ships/ExampleShip.sol";
 
 contract DeployBigSky is Script {
 
-    function run() public {
-      vm.startBroadcast();
+  function run() public {
+    vm.startBroadcast();
+    BigSky bigsky = new BigSky();
+    Ship ship = new Ship(bigsky);
+  }
 
-      BigSky bigsky = new BigSky();
-      Ship ship = new Ship(bigsky);
-
-    }
 }

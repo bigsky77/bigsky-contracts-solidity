@@ -21,6 +21,7 @@ contract BigSky {
 
   event GameStarted(State state);
 
+  //event TurnComplete(uint256 turn, uint256 playerScore, ShipData ships, StarData[] allStars);
   event TurnComplete(uint256 turn, uint256 playerScore, ShipData ships, StarData[] allStars, EnemyData[] allEnemies);
 
   event GameOver(address playerAddress, uint256 score, uint256 highScore, uint256 starsCaptured, uint256 gamesPlayed);
@@ -103,7 +104,6 @@ contract BigSky {
     PlayerData memory player = getPlayerData[msg.sender];
     player.playerAddress = address(msg.sender);
 
-
     uint256 x = getRandomX(entropy);
     uint256 y = getRandomY(entropy);
 
@@ -169,6 +169,7 @@ contract BigSky {
 
       checkCollide(currentShip);
 
+      //emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allStars);
       emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allStars, allEnemies);
     } 
 

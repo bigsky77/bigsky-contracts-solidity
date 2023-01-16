@@ -21,7 +21,6 @@ contract BigSky {
 
   event GameStarted(State state);
 
-  //event TurnComplete(uint256 turn, uint256 playerScore, ShipData ships, StarData[] allStars);
   event TurnComplete(uint256 turn, uint256 playerScore, ShipData ships, StarData[] allStars, EnemyData[] allEnemies);
 
   event GameOver(address playerAddress, uint256 score, uint256 highScore, uint256 starsCaptured, uint256 gamesPlayed);
@@ -112,7 +111,6 @@ contract BigSky {
 
     uint256 totalships = ships.length; 
 
-    //if(totalships == PLAYERS_REQUIRED){
     entropy = uint72(block.timestamp);
     
     setStars(entropy);
@@ -120,8 +118,6 @@ contract BigSky {
 
     state = State.ACTIVE; 
     play(turn);
-    //} else require(totalships < PLAYERS_REQUIRED, "not enough players");
-
   }
   
   function setStars(uint72 _entropy) internal {
@@ -169,7 +165,6 @@ contract BigSky {
 
       checkCollide(currentShip);
 
-      //emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allStars);
       emit TurnComplete(currentTurn, playerScore, getShipData[currentShip], allStars, allEnemies);
     } 
 

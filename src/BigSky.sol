@@ -112,7 +112,7 @@ contract BigSky {
     uint256 totalships = ships.length; 
 
     entropy = uint72(block.timestamp);
-    
+  
     setStars(entropy);
     setEnemies(entropy);
 
@@ -160,7 +160,7 @@ contract BigSky {
       uint currentTurn = _turns;
       Ship currentShip = allShips[ships.length - 1];
       ShipData memory playerShip = getShipData[currentShip];
-
+  
       currentShip.takeYourTurn{gas: 2_000_000}(playerShip, allStars);
 
       checkCollide(currentShip);

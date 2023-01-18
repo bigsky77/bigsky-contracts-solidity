@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import { Ship } from './ships/Ship.sol';
 import "../lib/solmate/src/utils/SafeCastLib.sol";
+import "../lib/openzeppelin-contracts/contracts/utils/math/SafeMath.sol"; 
 
 contract BigSky {
   using SafeCastLib for uint256;
@@ -26,6 +27,8 @@ contract BigSky {
   event GameOver(address playerAddress, uint256 score, uint256 highScore, uint256 starsCaptured, uint256 gamesPlayed);
 
   event StarCaptured(uint256 playerScore);
+ 
+  event EnemyHit(uint256 playerScore);
   
   /*//////////////////////////////////////////////////////////////
                               MODIFIERS
@@ -161,7 +164,8 @@ contract BigSky {
       Ship currentShip = allShips[ships.length - 1];
       ShipData memory playerShip = getShipData[currentShip];
   
-      currentShip.takeYourTurn{gas: 2_000_000}(playerShip, allStars);
+      enemyMove(_turns);
+      currentShip.takeYourTurn{gas: 2_000_000}(playerShip, allStars, allEnemies);
 
       checkCollide(currentShip);
 
@@ -199,8 +203,21 @@ contract BigSky {
             stars[j].isActive = false;
             emit StarCaptured(playerScore);
       }
-    }
-  } 
+
+    for (uint256 i = 0; i < enemies.length; i++) {
+      if (enemies[i].positionX == currentShip.positionX && 
+          enemies[i].positionY == currentShip.positionY &&
+          enemies[i].isActive == true){
+            if(playerScore <= 5){
+              playerScore = 0;
+            } else {
+              playerScore -= 5; 
+            }
+            emit EnemyHit(playerScore);
+        }
+      }
+    } 
+  }
 
   /*//////////////////////////////////////////////////////////////
                             SHIP ACTIONS
@@ -220,7 +237,7 @@ contract BigSky {
 
       else 
       if(_move == 1){
-        if((ship.positionY - 1) <= 1){
+        if(ship.positionY <= 1){
           ship.positionY = rangeY;
         } else {
           ship.positionY -= 1;
@@ -246,6 +263,56 @@ contract BigSky {
      }
 
      ship.balance -= 1;
+  }
+
+  /*//////////////////////////////////////////////////////////////
+                               ENEMY
+  //////////////////////////////////////////////////////////////*/
+
+  function enemyMove(uint256 _turns) internal {
+    uint256 random = uint(keccak256(abi.encodePacked(entropy * _turns))) % 4;
+
+    for(uint256 j = 0; j < enemies.length; j++){
+       
+      //move up 1
+      if(random == 0){
+        if(enemies[j].positionY + 1 > rangeY){
+          enemies[j].positionY = 0;
+        } else {
+          enemies[j].positionY += 1;
+        } 
+      } 
+      
+      //move down 1
+      else 
+        if(random == 1){
+          if(enemies[j].positionY <= 1){
+            enemies[j].positionY = rangeY;
+          } else {
+            enemies[j].positionY -= 1;
+          } 
+      } 
+
+      // move right 1
+      else 
+        if(random == 2){
+          if((enemies[j].positionX + 1) > rangeX){
+            enemies[j].positionX = 0;
+          } else {
+            enemies[j].positionX += 1;
+          } 
+      } 
+
+      // move left 1 
+      else 
+        if(random == 3){
+          if((enemies[j].positionX - 1) <= 1){
+            enemies[j].positionX = rangeX;
+          } else {
+            enemies[j].positionX -= 1;
+        }     
+      }
+    }
   }
 
   /*//////////////////////////////////////////////////////////////

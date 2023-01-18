@@ -8,7 +8,7 @@ contract ExampleShip is Ship {
 
   constructor(BigSky _bigsky) Ship(bigsky){}
 
-  function takeYourTurn(BigSky.ShipData memory yourShip, BigSky.StarData[] memory allStars) external override  {
+  function takeYourTurn(BigSky.ShipData memory yourShip, BigSky.StarData[] memory allStars) external   {
     uint256 x = yourShip.positionX;
     uint256 y = yourShip.positionY;
     

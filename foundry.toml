@@ -9,3 +9,5 @@ fuzz_runs = 10000
 [profile.fs_permissions]
 fs_permissions = [{ access = "write", path = "./"}]
 
+[rpc_endpoints]
+goerli = "${GOERLI_RPC_URL}"

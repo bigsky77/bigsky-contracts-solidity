@@ -11,14 +11,9 @@ contract Ship {
   }
 
   function takeYourTurn(BigSky.ShipData memory yourShip, BigSky.StarData[] memory allStars, BigSky.EnemyData[] memory allEnemies) external virtual  {
-    uint8 nextMove = findNearestStar(allStars, yourShip);
-    bigsky.playerMove(nextMove);    
+    bigsky.playerMove(0);    
+    bigsky.playerMove(2);    
   }
-
-  function findNearestStar(BigSky.StarData[] memory allStars, BigSky.ShipData memory yourShip) internal view returns(uint8) {
-   
-  }
-
   
 }
 

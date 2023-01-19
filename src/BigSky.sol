@@ -188,7 +188,7 @@ contract BigSky {
     }
     
     player.gamesPlayed += 1;
-
+    
     emit GameOver(address(msg.sender), playerScore, player.highScore, starsCaptured, player.gamesPlayed);
   }
 
@@ -270,7 +270,7 @@ contract BigSky {
   //////////////////////////////////////////////////////////////*/
 
   function enemyMove(uint256 _turns) internal {
-    uint256 random = uint(keccak256(abi.encodePacked(entropy * _turns))) % 4;
+    uint256 random = uint(keccak256(abi.encodePacked(entropy * _turns))) % 3;
 
     for(uint256 j = 0; j < enemies.length; j++){
        

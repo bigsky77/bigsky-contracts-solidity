@@ -6,12 +6,10 @@ import "forge-std/Script.sol";
 import "../src/BigSky.sol";
 import "../src/ships/Ship.sol";
 
-contract DeployBigSky is Script {
+contract DeployShip is Script {
 
   function run() public {
     vm.startBroadcast();
-    BigSky bigsky = new BigSky();
-    Ship ship = new Ship(bigsky);
   }
 
 }
